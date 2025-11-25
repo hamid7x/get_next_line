@@ -6,7 +6,7 @@
 /*   By: houkaamo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 11:24:56 by houkaamo          #+#    #+#             */
-/*   Updated: 2025/11/25 15:12:48 by houkaamo         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:56:02 by houkaamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ static char	*fill_stash(int fd, char *stash)
 	if (!read_buffer)
 		return (NULL);
 	bytes_read = read(fd, read_buffer, BUFFER_SIZE);
-	read_buffer[bytes_read] = '\0';
 	while (bytes_read > 0)
 	{
+		read_buffer[bytes_read] = '\0';
 		tmp = stash;
 		stash = ft_strjoin(stash, read_buffer);
 		free(tmp);
@@ -55,7 +55,8 @@ static char	*fill_stash(int fd, char *stash)
 		free(read_buffer);
 		read_buffer = malloc(sizeof(char) * (size_t)(BUFFER_SIZE + 1));
 		bytes_read = read(fd, read_buffer, BUFFER_SIZE);
-		read_buffer[bytes_read] = '\0';
+		if (bytes_read < 0)
+			return (free(read_buffer), NULL);
 	}
 	free(read_buffer);
 	return (stash);
