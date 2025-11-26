@@ -56,7 +56,7 @@ static char	*fill_stash(int fd, char *stash)
 	int		bytes_read;
 
 	if (!read_file(fd, &read_buffer, &bytes_read))
-		return (NULL);
+		return (free(stash),NULL);
 	while (bytes_read > 0)
 	{
 		read_buffer[bytes_read] = '\0';
@@ -69,7 +69,7 @@ static char	*fill_stash(int fd, char *stash)
 			break ;
 		free(read_buffer);
 		if (!read_file(fd, &read_buffer, &bytes_read))
-			return (NULL);
+			return (free(stash), NULL);
 	}
 	free(read_buffer);
 	return (stash);
