@@ -19,13 +19,17 @@ static char	*extract_line(char *s)
 	i = 0;
 	while (s[i] && s[i] != '\n')
 		i++;
-	return (ft_substr(s, 0, ++i));
+	if (s[i] == '\n')
+		i++;
+	return (ft_substr(s, 0, i));
 }
 
 static char	*get_leftover(char *s)
 {
 	int	i;
 
+	if (!s)
+		return (NULL);
 	i = 0;
 	while (s[i] && s[i] != '\n')
 		i++;
@@ -38,7 +42,7 @@ static int	read_file(int fd, char **read_buffer, int *bytes_read)
 {
 	*read_buffer = malloc(sizeof(char) * (size_t)(BUFFER_SIZE + 1));
 	if (!*read_buffer)
-		return (0);
+		return (0); 
 	*bytes_read = read(fd, *read_buffer, BUFFER_SIZE);
 	if (*bytes_read < 0)
 	{
@@ -81,6 +85,8 @@ char	*get_next_line(int fd)
 	char		*tmp;
 	char		*line;
 
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
 	stash = fill_stash(fd, stash);
 	if (!stash || stash[0] == '\0')
 	{
