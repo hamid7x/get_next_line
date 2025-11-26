@@ -6,7 +6,7 @@
 /*   By: houkaamo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 11:24:56 by houkaamo          #+#    #+#             */
-/*   Updated: 2025/11/26 11:00:53 by houkaamo         ###   ########.fr       */
+/*   Updated: 2025/11/26 17:39:03 by houkaamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static int	read_file(int fd, char **read_buffer, int *bytes_read)
 {
 	*read_buffer = malloc(sizeof(char) * (size_t)(BUFFER_SIZE + 1));
 	if (!*read_buffer)
-		return (0); 
+		return (0);
 	*bytes_read = read(fd, *read_buffer, BUFFER_SIZE);
 	if (*bytes_read < 0)
 	{
@@ -60,7 +60,7 @@ static char	*fill_stash(int fd, char *stash)
 	int		bytes_read;
 
 	if (!read_file(fd, &read_buffer, &bytes_read))
-		return (free(stash),NULL);
+		return (free(stash), NULL);
 	while (bytes_read > 0)
 	{
 		read_buffer[bytes_read] = '\0';
