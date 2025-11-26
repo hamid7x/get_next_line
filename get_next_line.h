@@ -6,15 +6,17 @@
 /*   By: houkaamo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 14:25:56 by houkaamo          #+#    #+#             */
-/*   Updated: 2025/11/25 14:29:55 by houkaamo         ###   ########.fr       */
+/*   Updated: 2025/11/26 12:17:54 by houkaamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
-# define BUFFER_SIZE 5
 
-# include<stdio.h>
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 5
+# endif
+
 # include<unistd.h>
 # include<stdlib.h>
 # include<fcntl.h>
