@@ -40,7 +40,7 @@ static char	*get_leftover(char *s)
 
 static int	read_file(int fd, char **read_buffer, int *bytes_read)
 {
-	*read_buffer = malloc(sizeof(char) * (size_t)(BUFFER_SIZE + 1));
+	*read_buffer = malloc(sizeof(char) * ((size_t)BUFFER_SIZE + 1));
 	if (!*read_buffer)
 		return (0);
 	*bytes_read = read(fd, *read_buffer, BUFFER_SIZE);
@@ -95,6 +95,12 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	line = extract_line(stash);
+	if (!line)
+	{
+		free(stash);
+		stash = NULL;
+		return (NULL);
+	}
 	tmp = stash;
 	stash = get_leftover(stash);
 	free(tmp);
