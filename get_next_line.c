@@ -38,29 +38,16 @@ static char	*get_leftover(char *s)
 	return (ft_substr(s, i + 1, ft_strlen(s) - (i + 1)));
 }
 
-static int	read_file(int fd, char **read_buffer, int *bytes_read)
-{
-	*read_buffer = malloc(sizeof(char) * ((size_t)BUFFER_SIZE + 1));
-	if (!*read_buffer)
-		return (0);
-	*bytes_read = read(fd, *read_buffer, BUFFER_SIZE);
-	if (*bytes_read < 0)
-	{
-		free(*read_buffer);
-		*read_buffer = NULL;
-		return (0);
-	}
-	return (1);
-}
-
 static char	*fill_stash(int fd, char *stash)
 {
 	char	*read_buffer;
 	char	*tmp;
 	int		bytes_read;
 
-	if (!read_file(fd, &read_buffer, &bytes_read))
+	read_buffer = malloc(sizeof(char) * ((size_t)(BUFFER_SIZE + 1)));
+	if (!read_buffer)
 		return (free(stash), NULL);
+	bytes_read = read(fd, read_buffer, BUFFER_SIZE);
 	while (bytes_read > 0)
 	{
 		read_buffer[bytes_read] = '\0';
@@ -71,10 +58,10 @@ static char	*fill_stash(int fd, char *stash)
 			return (free(read_buffer), NULL);
 		if (ft_strchr(read_buffer, '\n'))
 			break ;
-		free(read_buffer);
-		if (!read_file(fd, &read_buffer, &bytes_read))
-			return (free(stash), NULL);
+		bytes_read = read(fd, read_buffer, BUFFER_SIZE);
 	}
+	if (bytes_read < 0)
+		return (free(read_buffer), free(stash), NULL);
 	free(read_buffer);
 	return (stash);
 }
