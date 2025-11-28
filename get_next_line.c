@@ -11,34 +11,38 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-static char	*extract_line(char *s)
+#include <stdio.h>
+static void	split_stash(char *stash, char **line, char **leftover)
 {
-	int	i;
+	size_t	i;
 
+	if (!stash)
+	{
+		*line = NULL;
+		*leftover = NULL;
+		return ;
+	}
 	i = 0;
-	while (s[i] && s[i] != '\n')
+	while (stash[i] && stash[i] != '\n')
 		i++;
-	if (s[i] == '\n')
-		i++;
-	return (ft_substr(s, 0, i));
+	if (stash[i] == '\n')
+	{
+		*line = ft_substr(stash, 0, i + 1);
+		if (stash[i + 1] != '\0')
+			*leftover = ft_substr(stash, i + 1, ft_strlen(stash) - (i + 1));
+		else
+			*leftover = NULL;
+	}
+	else
+	{
+		*line = ft_substr(stash, 0, i);
+		*leftover = NULL;
+	}
+	free (stash);
+
 }
 
-static char	*get_leftover(char *s)
-{
-	int	i;
-
-	if (!s)
-		return (NULL);
-	i = 0;
-	while (s[i] && s[i] != '\n')
-		i++;
-	if (s[i] != '\n')
-		return (NULL);
-	return (ft_substr(s, i + 1, ft_strlen(s) - (i + 1)));
-}
-
-static char	*fill_stash(int fd, char *stash)
+static char	*read_and_join(int fd, char *stash)
 {
 	char	*read_buffer;
 	char	*tmp;
@@ -69,27 +73,11 @@ static char	*fill_stash(int fd, char *stash)
 char	*get_next_line(int fd)
 {
 	static char	*stash;
-	char		*tmp;
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	stash = fill_stash(fd, stash);
-	if (!stash || stash[0] == '\0')
-	{
-		free(stash);
-		stash = NULL;
-		return (NULL);
-	}
-	line = extract_line(stash);
-	if (!line)
-	{
-		free(stash);
-		stash = NULL;
-		return (NULL);
-	}
-	tmp = stash;
-	stash = get_leftover(stash);
-	free(tmp);
+	stash = read_and_join(fd, stash);
+	split_stash(stash, &line, &stash);
 	return (line);
 }

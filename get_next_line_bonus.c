@@ -12,33 +12,36 @@
 
 #include "get_next_line_bonus.h"
 
-static char	*extract_line(char *s)
+static void	split_stash(char *stash, char **line, char **leftover)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
-	while (s[i] && s[i] != '\n')
+	if (!stash)
+	{
+		*line = NULL;
+		*leftover = NULL;
+		return ;
+	}
+	while (stash[i] && stash[i] != '\n')
 		i++;
-	if (s[i] == '\n')
-		i++;
-	return (ft_substr(s, 0, i));
+	if (stash[i] == '\n')
+	{
+		*line = ft_substr(stash, 0, i + 1);
+		if (stash[i + 1] != '\0')
+			*leftover = ft_substr(stash, i + 1, ft_strlen(stash) - (i + 1));
+		else
+			*leftover = NULL;
+	}
+	else
+	{
+		*line = ft_substr(stash, 0 , i);
+		*leftover = NULL;
+	}
+	free(stash);
 }
 
-static char	*get_leftover(char *s)
-{
-	int	i;
-
-	if (!s)
-		return (NULL);
-	i = 0;
-	while (s[i] && s[i] != '\n')
-		i++;
-	if (s[i] != '\n')
-		return (NULL);
-	return (ft_substr(s, i + 1, ft_strlen(s) - (i + 1)));
-}
-
-static char	*fill_stash(int fd, char *stash)
+static char	*read_and_join(int fd, char *stash)
 {
 	char	*read_buffer;
 	char	*tmp;
@@ -66,33 +69,48 @@ static char	*fill_stash(int fd, char *stash)
 	return (stash);
 }
 
-static t_fdnode	*manage_fdnode(t_fdnode **head, int fd, int mode)
+static t_fdnode	*create_fdnode(t_fdnode **head, int fd)
 {
-	t_fdnode	*t;
+	t_fdnode	*new;
+	t_fdnode	*tmp;
+
+	tmp = *head;
+	while (tmp)
+	{
+		if (tmp->fd == fd)
+			return (tmp);
+		tmp = tmp->next;
+	}
+	new = malloc(sizeof(t_fdnode));
+	if (!new)
+		return (NULL);
+	new->fd = fd;
+	new->stash = NULL;
+	new->next = *head;
+	*head = new;
+	return (new);
+}
+
+static void	remove_fdnode(t_fdnode **head, int fd)
+{
+	t_fdnode	*tmp;
 	t_fdnode	*prev;
 
-	t = *head;
+	tmp = *head;
 	prev = NULL;
-	while (t && t->fd != fd)
+	while(tmp && tmp->fd != fd)
 	{
-		prev = t;
-		t = t->next;
+		prev = tmp;
+		tmp = tmp->next;
 	}
-	if (mode == 1 && t)
-	{
-		if (prev)
-			return (prev->next = t->next, free(t->stash), free(t), NULL);
-		else
-			return (*head = t->next, free(t->stash), free(t), NULL);
-	}
-	if (!t && mode == 0)
-	{
-		t = malloc(sizeof(t_fdnode));
-		if (!t)
-			return (NULL);
-		return (t->fd = fd, t->stash = NULL, t->next = *head,*head = t, t);
-	}
-	return (t);
+	if (!tmp)
+		return ;
+	if (prev)
+		prev->next = tmp->next;
+	else
+		*head = tmp->next;
+	free(tmp->stash);
+	free(tmp);
 }
 
 char	*get_next_line(int fd)
@@ -104,19 +122,14 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	tmp = manage_fdnode(&head, fd, 0);
+	tmp = create_fdnode(&head, fd);
 	if (!tmp)
 		return (NULL);
-	tmp -> stash = fill_stash(fd, tmp->stash);
-	if (!tmp->stash || tmp->stash[0] == '\0')
-		return (manage_fdnode(&head, fd, 1), NULL);
-	line = extract_line(tmp->stash);
+	tmp -> stash = read_and_join(fd, tmp->stash);
+	split_stash(tmp->stash, &line, &tmp->stash);
 	if (!line)
-		return (manage_fdnode(&head, fd, 1), NULL);
-	old_stash = tmp->stash;
-	tmp->stash = get_leftover(tmp->stash);
-	free(old_stash);
+		return (remove_fdnode(&head, fd), NULL);
 	if (!tmp->stash)
-		manage_fdnode(&tmp, fd, 1);
+		remove_fdnode(&head, fd);
 	return (line);
 }
