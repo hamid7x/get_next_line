@@ -41,7 +41,7 @@ static void	split_stash(char *stash, char **line, char **leftover)
 	free (stash);
 }
 
-static char	*read_and_join(int fd, char *stash)
+static char	*read_append_stash(int fd, char *stash)
 {
 	char	*read_buffer;
 	char	*tmp;
@@ -76,7 +76,7 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	stash = read_and_join(fd, stash);
+	stash = read_append_stash(fd, stash);
 	split_stash(stash, &line, &stash);
 	if (!line)
 	{

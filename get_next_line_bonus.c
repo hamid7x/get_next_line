@@ -41,7 +41,7 @@ static void	split_stash(char *stash, char **line, char **leftover)
 	free(stash);
 }
 
-static char	*read_and_join(int fd, char *stash)
+static char	*read_append_stash(int fd, char *stash)
 {
 	char	*read_buffer;
 	char	*tmp;
@@ -125,7 +125,7 @@ char	*get_next_line(int fd)
 	tmp = create_fdnode(&head, fd);
 	if (!tmp)
 		return (NULL);
-	tmp -> stash = read_and_join(fd, tmp->stash);
+	tmp -> stash = read_append_stash(fd, tmp->stash);
 	split_stash(tmp->stash, &line, &tmp->stash);
 	if (!line)
 		return (remove_fdnode(&head, fd), NULL);
