@@ -35,7 +35,7 @@ static void	split_stash(char *stash, char **line, char **leftover)
 	}
 	else
 	{
-		*line = ft_substr(stash, 0 , i);
+		*line = ft_substr(stash, 0, i);
 		*leftover = NULL;
 	}
 	free(stash);
@@ -98,7 +98,7 @@ static void	remove_fdnode(t_fdnode **head, int fd)
 
 	tmp = *head;
 	prev = NULL;
-	while(tmp && tmp->fd != fd)
+	while (tmp && tmp -> fd != fd)
 	{
 		prev = tmp;
 		tmp = tmp->next;

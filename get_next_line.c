@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
+
 static void	split_stash(char *stash, char **line, char **leftover)
 {
 	size_t	i;
@@ -39,7 +39,6 @@ static void	split_stash(char *stash, char **line, char **leftover)
 		*leftover = NULL;
 	}
 	free (stash);
-
 }
 
 static char	*read_and_join(int fd, char *stash)
@@ -79,5 +78,11 @@ char	*get_next_line(int fd)
 		return (NULL);
 	stash = read_and_join(fd, stash);
 	split_stash(stash, &line, &stash);
+	if (!line)
+	{
+		free(stash);
+		stash = NULL;
+		return (NULL);
+	}
 	return (line);
 }
