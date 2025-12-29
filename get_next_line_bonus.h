@@ -19,7 +19,6 @@
 
 # include<unistd.h>
 # include<stdlib.h>
-# include<fcntl.h>
 
 typedef struct s_fdnode
 {
